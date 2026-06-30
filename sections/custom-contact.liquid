@@ -1,0 +1,514 @@
+{% comment %}
+  sections/custom-customer-form.liquid
+{% endcomment %}
+
+<div class="contact-wrapper page-width">
+
+  <!-- LEFT FORM -->
+  <div class="contact-form-side">
+
+    <h2 class="main-heading">
+      {{ section.settings.heading }}
+    </h2>
+
+    <h3 class="sub-heading">
+      {{ section.settings.form_heading }}
+    </h3>
+
+    {% form 'contact' %}
+
+      {% if form.posted_successfully? %}
+        <p class="success-message">
+          {{ section.settings.success_message }}
+        </p>
+      {% endif %}
+
+      {{ form.errors | default_errors }}
+
+      <!-- CIVILITY -->
+      <div class="field-group">
+        <label class="label-title">Civilité *</label>
+
+        <div class="radio-group">
+          <label><input type="radio" name="contact[civility]" value="Mme"> Mme.</label>
+          <label><input type="radio" name="contact[civility]" value="Mlle"> Mlle.</label>
+          <label><input type="radio" name="contact[civility]" value="M"> M.</label>
+        </div>
+      </div>
+
+      <!-- NAME -->
+      <div class="two-column">
+
+        <div class="field-group">
+          <label>{{ section.settings.last_name_label }}</label>
+          <input type="text" name="contact[last_name]" required>
+        </div>
+
+        <div class="field-group">
+          <label>{{ section.settings.first_name_label }}</label>
+          <input type="text" name="contact[first_name]" required>
+        </div>
+
+      </div>
+
+      <!-- EMAIL -->
+      <div class="field-group">
+        <label>{{ section.settings.email_label }}</label>
+        <input type="email" name="contact[email]" required>
+      </div>
+
+      <!-- PHONE -->
+      <div class="field-group">
+        <label>{{ section.settings.phone_label }}</label>
+        <small>{{ section.settings.phone_text }}</small>
+        <input type="tel" name="contact[phone]">
+      </div>
+
+      <!-- REASON -->
+      <div class="field-group">
+        <label>{{ section.settings.reason_label }}</label>
+
+        <select name="contact[reason]" required>
+        {% assign reason_options = section.settings.reason_options | newline_to_br | split: '<br />' %}
+
+        {% for option in reason_options %}
+            {% if option != blank %}
+            <option value="{{ option | strip }}">
+                {{ option | strip }}
+            </option>
+            {% endif %}
+        {% endfor %}
+
+        </select>
+      </div>
+
+      <!-- SUBJECT -->
+      <div class="field-group">
+        <label>{{ section.settings.subject_label }}</label>
+        <input type="text" name="contact[subject]" required>
+      </div>
+
+      <!-- MESSAGE -->
+      <div class="field-group">
+        <label>{{ section.settings.message_label }}</label>
+        <textarea name="contact[body]" rows="8" required></textarea>
+      </div>
+
+      <!-- ORDER NUMBER -->
+      <div class="field-group">
+        <label>{{ section.settings.order_label }}</label>
+        <input
+          type="text"
+          name="contact[order_number]"
+          placeholder="Exemple : 35652268"
+        >
+      </div>
+
+      <!-- DESCRIPTION -->
+      <div class="privacy-text">
+        {{ section.settings.description }}
+      </div>
+
+      <!-- CHECKBOX -->
+      <div class="checkbox-group">
+        <input type="checkbox" required>
+        <label>{{ section.settings.checkbox_text }}</label>
+      </div>
+
+      <!-- BUTTON -->
+      <button type="submit" class="submit-btn">
+        {{ section.settings.button_text }}
+      </button>
+
+    {% endform %}
+
+  </div>
+
+  <!-- RIGHT SIDE -->
+  <div class="contact-info-side">
+
+    <div class="info-box">
+
+      <div class="icon">
+        {% if section.settings.support_icon != blank %}
+            <img 
+            src="{{ section.settings.support_icon | image_url }}" 
+            alt="Support Icon"
+            width="60"
+            height="60"
+            >
+        {% endif %}
+        </div>
+
+      <h3>{{ section.settings.support_heading }}</h3>
+
+      <p>{{ section.settings.support_text }}</p>
+
+      <p class="phone-number">
+        {{ section.settings.phone_number }}
+      </p>
+
+      <p>{{ section.settings.support_description }}</p>
+
+    </div>
+
+    <div class="info-box faq-box">
+
+      <div class="icon">
+        {% if section.settings.faq_icon != blank %}
+            <img 
+            src="{{ section.settings.faq_icon | image_url }}" 
+            alt="FAQ Icon"
+            width="60"
+            height="60"
+            >
+        {% endif %}
+        </div>
+
+      <h3>{{ section.settings.faq_heading }}</h3>
+
+      <p>{{ section.settings.faq_text }}</p>
+
+      <a href="{{ section.settings.faq_link }}" class="faq-btn">
+        {{ section.settings.faq_button }}
+      </a>
+
+    </div>
+
+  </div>
+
+</div>
+
+<style>
+
+.contact-wrapper{
+  display:flex;
+  gap:80px;
+  max-width:1200px;
+  margin:40px auto;
+}
+
+.contact-form-side{
+  width:55%;
+}
+
+.contact-info-side{
+  width:45%;
+  border-left:1px solid #ddd;
+  padding-left:60px;
+}
+
+.main-heading{
+  font-size:32px;
+  margin-bottom:30px;
+  text-transform:uppercase;
+}
+
+.sub-heading{
+  font-size:22px;
+  margin-bottom:30px;
+  text-transform:uppercase;
+}
+
+.field-group{
+  margin-bottom:25px;
+}
+
+.field-group label{
+  display:block;
+  margin-bottom:8px;
+  font-weight:600;
+  text-transform:uppercase;
+  font-size:14px;
+}
+
+.field-group input,
+.field-group textarea,
+.field-group select{
+  width:100%;
+  border:1px solid #dcdcdc;
+  padding:14px;
+  font-size:14px;
+}
+
+.two-column{
+  display:flex;
+  gap:20px;
+}
+
+.two-column .field-group{
+  width:50%;
+}
+
+.radio-group{
+  display:flex;
+  gap:20px;
+  align-items:center;
+}
+
+.radio-group label{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  margin-bottom:0;
+}
+
+small{
+  display:block;
+  margin-bottom:10px;
+  color:#777;
+}
+
+.privacy-text{
+  color:#666;
+  line-height:1.8;
+  margin-bottom:25px;
+}
+
+.checkbox-group{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin-bottom:30px;
+}
+
+.submit-btn{
+  width:100%;
+  background:#111;
+  color:#fff;
+  border:none;
+  padding:18px;
+  font-size:16px;
+  cursor:pointer;
+  text-transform:uppercase;
+}
+
+.info-box{
+  text-align:center;
+  margin-bottom:100px;
+}
+
+.icon{
+  font-size:50px;
+  margin-bottom:20px;
+}
+
+.info-box h3{
+  font-size:30px;
+  margin-bottom:20px;
+  color:#2d6b45;
+  text-transform:uppercase;
+}
+
+.phone-number{
+  font-size:28px;
+  margin:30px 0;
+}
+
+.faq-btn{
+  display:inline-block;
+  background:#111;
+  color:#fff;
+  text-decoration:none;
+  padding:16px 40px;
+  margin-top:20px;
+}
+
+.success-message{
+  color:green;
+  margin-bottom:20px;
+}
+
+@media(max-width:768px){
+
+  .contact-wrapper{
+    flex-direction:column;
+  }
+
+  .contact-form-side,
+  .contact-info-side{
+    width:100%;
+  }
+
+  .contact-info-side{
+    border-left:none;
+    padding-left:0;
+  }
+
+  .two-column{
+    flex-direction:column;
+  }
+
+  .two-column .field-group{
+    width:100%;
+  }
+
+}
+
+</style>
+
+{% schema %}
+{
+  "name": "Custom Customer Form",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Main Heading",
+      "default": "Nous Contacter"
+    },
+    {
+        "type": "textarea",
+        "id": "reason_options",
+        "label": "Reason Dropdown Options",
+        "default": "Commande et paiement\nLivraison\nRetour\nAutre"
+    },
+    {
+      "type": "text",
+      "id": "form_heading",
+      "label": "Form Heading",
+      "default": "Formulaire de Contact"
+    },
+    {
+      "type": "textarea",
+      "id": "phone_text",
+      "label": "Phone Description",
+      "default": "Il peut être utile si nous devons vous contacter rapidement."
+    },
+    {
+      "type": "richtext",
+      "id": "description",
+      "label": "Privacy Text",
+      "default": "<p>Votre texte de confidentialité ici.</p>"
+    },
+    {
+      "type": "text",
+      "id": "checkbox_text",
+      "label": "Checkbox Text",
+      "default": "J’accepte les conditions générales"
+    },
+    {
+  "type": "text",
+  "id": "last_name_label",
+  "label": "Last Name Label",
+  "default": "Nom *"
+},
+{
+  "type": "text",
+  "id": "first_name_label",
+  "label": "First Name Label",
+  "default": "Prénom *"
+},
+{
+  "type": "text",
+  "id": "email_label",
+  "label": "Email Label",
+  "default": "Adresse E-mail *"
+},
+{
+  "type": "text",
+  "id": "phone_label",
+  "label": "Phone Label",
+  "default": "N° de téléphone"
+},
+{
+  "type": "text",
+  "id": "reason_label",
+  "label": "Reason Label",
+  "default": "Raisons de contact *"
+},
+{
+  "type": "text",
+  "id": "subject_label",
+  "label": "Subject Label",
+  "default": "Sujet *"
+},
+{
+  "type": "text",
+  "id": "message_label",
+  "label": "Message Label",
+  "default": "Message *"
+},
+{
+  "type": "text",
+  "id": "order_label",
+  "label": "Order Number Label",
+  "default": "Numéro de commande"
+},
+    {
+      "type": "text",
+      "id": "button_text",
+      "label": "Button Text",
+      "default": "Envoyer"
+    },
+    {
+      "type": "text",
+      "id": "success_message",
+      "label": "Success Message",
+      "default": "Votre message a été envoyé."
+    },
+    {
+      "type": "text",
+      "id": "support_heading",
+      "label": "Support Heading",
+      "default": "Contact Service Clients"
+    },
+    {
+      "type": "textarea",
+      "id": "support_text",
+      "label": "Support Text",
+      "default": "Une question ?"
+    },
+    {
+    "type": "image_picker",
+    "id": "support_icon",
+    "label": "Support Icon"
+    },
+    {
+    "type": "image_picker",
+    "id": "faq_icon",
+    "label": "FAQ Icon"
+    },
+    {
+      "type": "text",
+      "id": "phone_number",
+      "label": "Phone Number",
+      "default": "02 46 948 009"
+    },
+    {
+      "type": "textarea",
+      "id": "support_description",
+      "label": "Support Description",
+      "default": "Pour contacter l'équipe service relation client."
+    },
+    {
+      "type": "text",
+      "id": "faq_heading",
+      "label": "FAQ Heading",
+      "default": "FAQ"
+    },
+    {
+      "type": "textarea",
+      "id": "faq_text",
+      "label": "FAQ Text",
+      "default": "Notre rubrique faq vous aide à obtenir une réponse immédiate."
+    },
+    {
+      "type": "text",
+      "id": "faq_button",
+      "label": "FAQ Button Text",
+      "default": "Voir les FAQ"
+    },
+    {
+      "type": "url",
+      "id": "faq_link",
+      "label": "FAQ Link"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Custom Customer Form"
+    }
+  ]
+}
+{% endschema %}

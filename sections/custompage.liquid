@@ -1,0 +1,75 @@
+{% schema %}
+{
+  "name": "Stacked Menus",
+  "blocks": [
+    {
+      "type": "menu_block",
+      "name": "Menu",
+      "settings": [
+        {
+          "type": "link_list",
+          "id": "menu",
+          "label": "Select Menu"
+        }
+      ]
+    }
+  ],
+  "max_blocks": 10,
+  "presets": [
+    {
+      "name": "Stacked Menus"
+    }
+  ]
+}
+{% endschema %}
+
+<div class="stacked-menus">
+  {% for block in section.blocks %}
+    {% assign menu = linklists[block.settings.menu] %}
+
+    {% if menu != blank %}
+      <div class="menu-block" data-index="{{ forloop.index0 }}">
+        
+        <ul class="menu-list {% unless forloop.first %}hidden{% endunless %}">
+          {% for link in menu.links %}
+            <li>
+              <a href="{{ link.url }}" class="menu-link">
+                {{ link.title }}
+              </a>
+            </li>
+          {% endfor %}
+        </ul>
+
+      </div>
+    {% endif %}
+  {% endfor %}
+</div>
+
+<style>
+    .hidden {
+  display: none;
+}
+</style>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const menuBlocks = document.querySelectorAll(".menu-block");
+
+    menuBlocks.forEach((block, index) => {
+      const links = block.querySelectorAll(".menu-link");
+
+      links.forEach(link => {
+        link.addEventListener("click", function (e) {
+          e.preventDefault(); // ✅ STOP page reload
+
+          const nextBlock = menuBlocks[index + 1];
+
+          if (nextBlock) {
+            const nextMenu = nextBlock.querySelector(".menu-list");
+            nextMenu.classList.remove("hidden");
+          }
+        });
+      });
+    });
+  });
+</script>
