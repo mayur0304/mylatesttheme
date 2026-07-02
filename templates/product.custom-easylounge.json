@@ -1,0 +1,37 @@
+{
+  "sections": {
+    "main": {
+      "type": "custom-product",
+      "blocks": {
+        "badge-1": { "type": "badge", "settings": { "label": "Soldes d'été", "bg_color": "#E53935", "text_color": "#FFFFFF" } },
+        "badge-2": { "type": "badge", "settings": { "label": "Choix de l'équipe", "bg_color": "#111111", "text_color": "#FFFFFF" } },
+        "rating-1": { "type": "rating", "settings": { "score": "4.9", "review_count": 250, "qa_link_text": "5 Questions/Réponses" } },
+        "discount-1": { "type": "discount_code", "settings": { "percent": 10, "code": "TV10", "reward_icon": "🎁", "reward_text": "15€ offerts en carte cadeau tous les 150€ d'achat" } },
+        "secondary-1": { "type": "secondary_action", "settings": { "label": "Demander un devis" } },
+        "secondary-2": { "type": "secondary_action", "settings": { "label": "Contacter un conseiller" } },
+        "callout-1": { "type": "callout_box", "settings": { "icon": "♻️", "text": "Seconde vie", "link_text": "2 offres dès 659€" } },
+        "info-1": { "type": "info_row", "settings": { "checkmark": false, "text": "Paiement en 3x, 4x, 10x, 20x, 30x, 40x", "link_text": "En savoir plus" } },
+        "info-2": { "type": "info_row", "settings": { "checkmark": true, "text": "Garantie 2 ans incluse" } },
+        "info-3": { "type": "info_row", "settings": { "checkmark": true, "text": "Garantie 5 ans disponible à 149€", "link_text": "En savoir plus" } },
+        "info-4": { "type": "info_row", "settings": { "checkmark": true, "text": "Livraison offerte soit 5,90€ d'économies", "link_text": "En savoir plus" } },
+        "feature-1": { "type": "feature_point", "settings": { "text": "Technologie OLED avancée" } },
+        "feature-2": { "type": "feature_point", "settings": { "text": "Fire TV intégré" } },
+        "feature-3": { "type": "feature_point", "settings": { "text": "Prise en charge Dolby Vision et HDR10+" } },
+        "feature-4": { "type": "feature_point", "settings": { "text": "Mode jeu avec HDMI 2.1 et VRR" } },
+        "feature-5": { "type": "feature_point", "settings": { "text": "Son immersif Surround Sound Pro" } },
+        "durability-1": { "type": "durability", "settings": { "durability_score": "9.5", "energy_label": "G" } },
+        "tab-1": { "type": "tab", "settings": { "tab_label": "Caractéristiques", "tab_content": "<p>Ajoutez ici les caractéristiques techniques détaillées.</p>" } },
+        "tab-2": { "type": "tab", "settings": { "tab_label": "Presse", "tab_content": "<p>Ajoutez ici les avis presse.</p>" } }
+      },
+      "block_order": [
+        "badge-1", "badge-2", "rating-1", "discount-1",
+        "secondary-1", "secondary-2", "callout-1",
+        "info-1", "info-2", "info-3", "info-4",
+        "feature-1", "feature-2", "feature-3", "feature-4", "feature-5",
+        "durability-1", "tab-1", "tab-2"
+      ],
+      "settings": {}
+    }
+  },
+  "order": ["main"]
+}

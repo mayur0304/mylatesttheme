@@ -1,0 +1,43 @@
+{%- comment -%}
+  Renders a main image + thumbnail strip from product.media.
+  Works with images and videos. No blocks needed — 100% dynamic.
+  Usage: {% render 'custom-product-gallery', product: product %}
+{%- endcomment -%}
+
+<div class="cp-gallery-wrap" data-gallery>
+  <div class="cp-gallery-main">
+    {%- for media in product.media limit: 1 -%}
+      <img src="{{ media | image_url: width: 1200 }}"
+           alt="{{ media.alt | default: product.title }}"
+           class="cp-gallery-main-img"
+           data-gallery-main-img
+           id="cp-main-media-{{ media.id }}">
+    {%- else -%}
+      <img src="{{ 'product-placeholder.svg' | placeholder_svg_tag }}" alt="{{ product.title }}" class="cp-gallery-main-img">
+    {%- endfor -%}
+  </div>
+
+  {%- if product.media.size > 1 -%}
+    <div class="cp-gallery-thumbs" data-gallery-thumbs>
+      {%- for media in product.media -%}
+        <button type="button"
+                class="cp-gallery-thumb{% if forloop.first %} is-active{% endif %}"
+                data-gallery-thumb
+                data-full-src="{{ media | image_url: width: 1200 }}"
+                data-media-type="{{ media.media_type }}"
+                aria-label="{{ media.alt | default: product.title }} — image {{ forloop.index }}">
+          <img src="{{ media | image_url: width: 200 }}" alt="{{ media.alt | default: product.title }}">
+          {%- if media.media_type == 'video' or media.media_type == 'external_video' -%}
+            <span class="cp-gallery-thumb-play">▶</span>
+          {%- endif -%}
+        </button>
+      {%- endfor -%}
+    </div>
+  {%- endif -%}
+
+  {%- if product.media.size > 8 -%}
+    <button type="button" class="cp-btn cp-btn--outline cp-gallery-more" data-gallery-show-all>
+      + Voir plus d'images
+    </button>
+  {%- endif -%}
+</div>

@@ -1,0 +1,66 @@
+{%- comment -%}
+  Renders variant selectors dynamically from product.options_with_values.
+  - An option whose values look like colors (or is literally named
+    Couleur/Color) renders as swatches.
+  - Every other option renders as pill buttons (e.g. Taille/Size).
+  Selecting updates the hidden variant id input + price/stock via JS
+  (see assets/custom-product.js) — no page reload, no app block needed.
+
+  Usage:
+  {% render 'custom-product-variant-picker', product: product, current_variant: current_variant %}
+{%- endcomment -%}
+
+<div class="cp-variant-picker" data-variant-picker
+     data-variants="{{ product.variants | json | escape }}">
+  {%- for option in product.options_with_values -%}
+    {%- assign option_lower = option.name | downcase -%}
+    <div class="cp-option-group" data-option-index="{{ forloop.index0 }}" data-option-name="{{ option.name }}">
+      <p class="cp-option-label">
+        {{ option.name }} :
+        <span data-selected-value>{{ option.selected_value }}</span>
+      </p>
+
+      {%- if option_lower contains 'couleur' or option_lower contains 'color' -%}
+        <div class="cp-swatches">
+          {%- for value in option.values -%}
+            {%- assign swatch_variant = product.variants | where: 'option' | first -%}
+            {%- comment -%} find a variant matching this value for image/swatch source {%- endcomment -%}
+            {%- assign matched_variant = nil -%}
+            {%- for v in product.variants -%}
+              {%- if v.options[forloop.parentloop.index0] == value -%}
+                {%- assign matched_variant = v -%}
+              {%- endif -%}
+            {%- endfor -%}
+
+            <button type="button"
+                    class="cp-swatch{% if value == option.selected_value %} is-selected{% endif %}"
+                    data-option-value="{{ value | escape }}"
+                    data-option-position="{{ option.position }}"
+                    aria-label="{{ value }}"
+                    title="{{ value }}"
+                    style="{% if matched_variant.featured_media %}background-image:url('{{ matched_variant.featured_media | image_url: width: 100 }}');{% else %}background-color:{{ value | handle }};{% endif %}">
+            </button>
+          {%- endfor -%}
+        </div>
+        {%- if option.values.size > 5 -%}
+          <button type="button" class="cp-link-more" data-show-more-options>+{{ option.values.size | minus: 5 }} Couleurs</button>
+        {%- endif -%}
+
+      {%- else -%}
+        <div class="cp-pills">
+          {%- for value in option.values -%}
+            <button type="button"
+                    class="cp-pill{% if value == option.selected_value %} is-selected{% endif %}"
+                    data-option-value="{{ value | escape }}"
+                    data-option-position="{{ option.position }}">
+              {{ value }}
+            </button>
+          {%- endfor -%}
+        </div>
+        {%- if option.values.size > 4 -%}
+          <button type="button" class="cp-link-more" data-show-more-options>+{{ option.values.size | minus: 4 }} Tailles</button>
+        {%- endif -%}
+      {%- endif -%}
+    </div>
+  {%- endfor -%}
+</div>

@@ -1,0 +1,46 @@
+{%- comment -%}
+  Description tabs. "Description" tab is always the dynamic
+  product.description. Any additional 'tab' blocks (Caractéristiques,
+  Presse, etc.) added in the customizer render as extra tabs.
+  A "Avis clients" tab auto-appears if product reviews metafield exists.
+
+  Usage: {% render 'custom-product-tabs', product: product, section: section %}
+{%- endcomment -%}
+
+{%- assign tab_blocks = section.blocks | where: 'type', 'tab' -%}
+
+<div class="cp-tabs" data-tabs>
+  <div class="cp-tabs-nav" role="tablist">
+    <button class="cp-tab-btn is-active" data-tab-btn data-tab-target="cp-tab-description" role="tab">
+      Description
+    </button>
+    {%- for block in tab_blocks -%}
+      <button class="cp-tab-btn" data-tab-btn data-tab-target="cp-tab-{{ forloop.index }}" role="tab" {{ block.shopify_attributes }}>
+        {{ block.settings.tab_label }}
+      </button>
+    {%- endfor -%}
+    {%- if product.metafields.reviews.rating != blank -%}
+      <button class="cp-tab-btn" data-tab-btn data-tab-target="cp-tab-reviews" role="tab">
+        Avis clients
+      </button>
+    {%- endif -%}
+  </div>
+
+  <div class="cp-tabs-panels">
+    <div class="cp-tab-panel is-active" id="cp-tab-description" data-tab-panel>
+      {{ product.description }}
+    </div>
+
+    {%- for block in tab_blocks -%}
+      <div class="cp-tab-panel" id="cp-tab-{{ forloop.index }}" data-tab-panel {{ block.shopify_attributes }}>
+        {{ block.settings.tab_content }}
+      </div>
+    {%- endfor -%}
+
+    {%- if product.metafields.reviews.rating != blank -%}
+      <div class="cp-tab-panel" id="cp-tab-reviews" data-tab-panel>
+        {{ product.metafields.reviews.rating_count }} avis — note moyenne {{ product.metafields.reviews.rating }}/5
+      </div>
+    {%- endif -%}
+  </div>
+</div>

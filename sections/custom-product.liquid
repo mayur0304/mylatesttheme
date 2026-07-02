@@ -1,0 +1,345 @@
+{%- comment -%}
+  Custom Product Template — easyLounge-style layout
+  Sections/blocks used so the merchant can edit badges, trust rows,
+  feature bullets, and the discount banner from the Theme Customizer,
+  while gallery / price / variants / description stay 100% dynamic
+  from the Shopify product object.
+{%- endcomment -%}
+
+{{ 'custom-product.css' | asset_url | stylesheet_tag }}
+
+{%- assign product = product -%}
+{%- assign current_variant = product.selected_or_first_available_variant -%}
+
+<div class="cp-wrap" data-product-handle="{{ product.handle }}">
+
+  {%- comment -%} Breadcrumb {%- endcomment -%}
+  <nav class="cp-breadcrumb" aria-label="breadcrumb">
+    <a href="{{ routes.root_url }}">Accueil</a>
+    <span>/</span>
+    {%- if product.collections.first -%}
+      <a href="{{ product.collections.first.url }}">{{ product.collections.first.title }}</a>
+      <span>/</span>
+    {%- endif -%}
+    <span class="cp-breadcrumb-current">{{ product.title }}</span>
+  </nav>
+
+  <div class="cp-main">
+
+    {%- comment -%} ============ LEFT: GALLERY ============ {%- endcomment -%}
+    <div class="cp-gallery">
+      {%- comment -%} Badges rendered from blocks so merchant controls copy/color {%- endcomment -%}
+      <div class="cp-badges">
+        {%- for block in section.blocks -%}
+          {%- if block.type == 'badge' -%}
+            <span class="cp-badge"
+                  style="background:{{ block.settings.bg_color }}; color:{{ block.settings.text_color }};"
+                  {{ block.shopify_attributes }}>
+              {{ block.settings.label }}
+            </span>
+          {%- endif -%}
+        {%- endfor -%}
+      </div>
+
+      {%- render 'custom-product-gallery', product: product -%}
+    </div>
+
+    {%- comment -%} ============ RIGHT: BUY BOX ============ {%- endcomment -%}
+    <div class="cp-info">
+
+      <h1 class="cp-title">{{ product.title }}</h1>
+      {%- if product.type != blank -%}
+        <p class="cp-type">{{ product.type }}</p>
+      {%- endif -%}
+
+      {%- comment -%} Rating block (optional, from block settings or metafield) {%- endcomment -%}
+      {%- for block in section.blocks -%}
+        {%- if block.type == 'rating' -%}
+          <div class="cp-rating" {{ block.shopify_attributes }}>
+            <span class="cp-star">★</span>
+            <strong>{{ block.settings.score }}</strong>
+            <span class="cp-rating-count">({{ block.settings.review_count }})</span>
+            {%- if block.settings.qa_link != blank -%}
+              <a href="{{ block.settings.qa_link }}" class="cp-qa-link">{{ block.settings.qa_link_text }}</a>
+            {%- endif -%}
+          </div>
+        {%- endif -%}
+      {%- endfor -%}
+
+      {%- comment -%} Discount code banner block {%- endcomment -%}
+      {%- for block in section.blocks -%}
+        {%- if block.type == 'discount_code' -%}
+          <div class="cp-discount-banner" {{ block.shopify_attributes }}>
+            <span class="cp-discount-pct">-{{ block.settings.percent }}%</span>
+            <span class="cp-discount-text">avec le code
+              <span class="cp-discount-code">{{ block.settings.code }}</span>
+            </span>
+            {%- if block.settings.reward_text != blank -%}
+              <span class="cp-discount-reward">{{ block.settings.reward_icon }} {{ block.settings.reward_text }}</span>
+            {%- endif -%}
+          </div>
+        {%- endif -%}
+      {%- endfor -%}
+
+      {%- comment -%} Price block — fully dynamic from product/variant {%- endcomment -%}
+      <div class="cp-price-row" data-price-wrapper>
+        <span class="cp-price" data-price>
+          {{ current_variant.price | money }}
+        </span>
+        {%- if current_variant.compare_at_price > current_variant.price -%}
+          <span class="cp-compare-price" data-compare-price>
+            {{ current_variant.compare_at_price | money }}
+          </span>
+          {%- assign discount_pct = current_variant.compare_at_price
+              | minus: current_variant.price
+              | times: 100.0
+              | divided_by: current_variant.compare_at_price
+              | round -%}
+          <span class="cp-price-pct">-{{ discount_pct }}%</span>
+        {%- endif -%}
+      </div>
+      {%- if product.metafields.custom.eco_tax != blank -%}
+        <p class="cp-eco-tax">ⓘ Dont {{ product.metafields.custom.eco_tax }} d'éco-part</p>
+      {%- endif -%}
+
+      {%- comment -%} Stock status — dynamic {%- endcomment -%}
+      <p class="cp-stock" data-stock-status>
+        {%- if current_variant.available -%}
+          <span class="cp-stock-dot cp-stock-dot--in"></span>
+          <strong>En stock</strong> : expédié sous 24h
+        {%- else -%}
+          <span class="cp-stock-dot cp-stock-dot--out"></span>
+          <strong>Rupture de stock</strong>
+        {%- endif -%}
+      </p>
+
+      {%- comment -%} Buy form {%- endcomment -%}
+      {%- form 'product', product, class: 'cp-buy-form' -%}
+        <input type="hidden" name="id" value="{{ current_variant.id }}" data-variant-id>
+
+        {%- render 'custom-product-variant-picker', product: product, current_variant: current_variant -%}
+
+        <div class="cp-cta-row">
+          <button type="submit"
+                  class="cp-btn cp-btn--primary"
+                  {% unless current_variant.available %}disabled{% endunless %}
+                  data-add-to-cart>
+            {%- if current_variant.available -%}Ajouter au panier{%- else -%}Indisponible{%- endif -%}
+          </button>
+        </div>
+
+        <div class="cp-cta-row cp-cta-row--split">
+          {%- for block in section.blocks -%}
+            {%- if block.type == 'secondary_action' -%}
+              <a href="{{ block.settings.link }}" class="cp-btn cp-btn--secondary" {{ block.shopify_attributes }}>
+                {{ block.settings.label }}
+              </a>
+            {%- endif -%}
+          {%- endfor -%}
+        </div>
+      {%- endform -%}
+
+      {%- comment -%} Optional "seconde vie" / refurbished box {%- endcomment -%}
+      {%- for block in section.blocks -%}
+        {%- if block.type == 'callout_box' -%}
+          <div class="cp-callout" {{ block.shopify_attributes }}>
+            {%- if block.settings.icon != blank -%}<span class="cp-callout-icon">{{ block.settings.icon }}</span>{%- endif -%}
+            <span>{{ block.settings.text }}</span>
+            {%- if block.settings.link != blank -%}
+              <a href="{{ block.settings.link }}">{{ block.settings.link_text }}</a>
+            {%- endif -%}
+          </div>
+        {%- endif -%}
+      {%- endfor -%}
+
+      {%- comment -%} Trust / payment / warranty rows {%- endcomment -%}
+      <div class="cp-trust-box">
+        {%- for block in section.blocks -%}
+          {%- if block.type == 'info_row' -%}
+            <p class="cp-trust-row" {{ block.shopify_attributes }}>
+              {%- if block.settings.checkmark -%}<span class="cp-check">✓</span>{%- endif -%}
+              {{ block.settings.text }}
+              {%- if block.settings.link != blank -%}
+                <a href="{{ block.settings.link }}">{{ block.settings.link_text }}</a>
+              {%- endif -%}
+            </p>
+            {%- if forloop.index0 == 0 -%}<hr class="cp-trust-divider">{%- endif -%}
+          {%- endif -%}
+        {%- endfor -%}
+      </div>
+
+      {%- comment -%} Feature bullet points ("Les points forts") {%- endcomment -%}
+      {%- assign has_features = false -%}
+      {%- for block in section.blocks -%}
+        {%- if block.type == 'feature_point' -%}{%- assign has_features = true -%}{%- endif -%}
+      {%- endfor -%}
+      {%- if has_features -%}
+        <div class="cp-features">
+          <h3>Les points forts :</h3>
+          <ul>
+            {%- for block in section.blocks -%}
+              {%- if block.type == 'feature_point' -%}
+                <li {{ block.shopify_attributes }}>{{ block.settings.text }}</li>
+              {%- endif -%}
+            {%- endfor -%}
+          </ul>
+        </div>
+      {%- endif -%}
+
+      {%- comment -%} Durability / energy label block {%- endcomment -%}
+      {%- for block in section.blocks -%}
+        {%- if block.type == 'durability' -%}
+          <div class="cp-durability" {{ block.shopify_attributes }}>
+            {%- if block.settings.durability_score != blank -%}
+              <div class="cp-durability-score">
+                <span class="cp-durability-label">Indice de durabilité</span>
+                <span class="cp-durability-value">{{ block.settings.durability_score }}<small>/10</small></span>
+              </div>
+            {%- endif -%}
+            {%- if block.settings.energy_label != blank -%}
+              <div class="cp-energy-label cp-energy-label--{{ block.settings.energy_label | downcase }}">
+                {{ block.settings.energy_label }}
+              </div>
+            {%- endif -%}
+          </div>
+        {%- endif -%}
+      {%- endfor -%}
+
+      <p class="cp-ref">REF PRODUIT : {{ current_variant.sku | default: product.id }}</p>
+    </div>
+  </div>
+
+  {%- comment -%} ============ DESCRIPTION TABS ============ {%- endcomment -%}
+  {%- render 'custom-product-tabs', product: product, section: section -%}
+</div>
+
+{{ 'custom-product.js' | asset_url | script_tag }}
+
+{% schema %}
+{
+  "name": "Custom Product Page",
+  "tag": null,
+  "settings": [],
+  "blocks": [
+    {
+      "type": "badge",
+      "name": "Badge",
+      "settings": [
+        { "type": "text", "id": "label", "label": "Texte du badge", "default": "Soldes d'été" },
+        { "type": "color", "id": "bg_color", "label": "Couleur de fond", "default": "#E53935" },
+        { "type": "color", "id": "text_color", "label": "Couleur du texte", "default": "#FFFFFF" }
+      ]
+    },
+    {
+      "type": "rating",
+      "name": "Note client",
+      "limit": 1,
+      "settings": [
+        { "type": "text", "id": "score", "label": "Note", "default": "4.9" },
+        { "type": "number", "id": "review_count", "label": "Nombre d'avis", "default": 250 },
+        { "type": "url", "id": "qa_link", "label": "Lien Questions/Réponses" },
+        { "type": "text", "id": "qa_link_text", "label": "Texte du lien", "default": "5 Questions/Réponses" }
+      ]
+    },
+    {
+      "type": "discount_code",
+      "name": "Bandeau code promo",
+      "limit": 1,
+      "settings": [
+        { "type": "number", "id": "percent", "label": "Pourcentage", "default": 10 },
+        { "type": "text", "id": "code", "label": "Code promo", "default": "TV10" },
+        { "type": "text", "id": "reward_icon", "label": "Icône", "default": "🎁" },
+        { "type": "text", "id": "reward_text", "label": "Texte récompense", "default": "15€ offerts en carte cadeau tous les 150€ d'achat" }
+      ]
+    },
+    {
+      "type": "secondary_action",
+      "name": "Bouton secondaire",
+      "settings": [
+        { "type": "text", "id": "label", "label": "Libellé", "default": "Demander un devis" },
+        { "type": "url", "id": "link", "label": "Lien" }
+      ]
+    },
+    {
+      "type": "callout_box",
+      "name": "Encart (ex: Seconde vie)",
+      "limit": 1,
+      "settings": [
+        { "type": "text", "id": "icon", "label": "Icône", "default": "♻️" },
+        { "type": "text", "id": "text", "label": "Texte", "default": "Seconde vie" },
+        { "type": "url", "id": "link", "label": "Lien" },
+        { "type": "text", "id": "link_text", "label": "Texte du lien", "default": "2 offres dès 659€" }
+      ]
+    },
+    {
+      "type": "info_row",
+      "name": "Ligne d'info (paiement/garantie)",
+      "settings": [
+        { "type": "checkbox", "id": "checkmark", "label": "Afficher une coche", "default": true },
+        { "type": "text", "id": "text", "label": "Texte", "default": "Garantie 2 ans incluse" },
+        { "type": "url", "id": "link", "label": "Lien (optionnel)" },
+        { "type": "text", "id": "link_text", "label": "Texte du lien", "default": "En savoir plus" }
+      ]
+    },
+    {
+      "type": "feature_point",
+      "name": "Point fort",
+      "settings": [
+        { "type": "text", "id": "text", "label": "Texte", "default": "Technologie OLED avancée" }
+      ]
+    },
+    {
+      "type": "durability",
+      "name": "Indice durabilité / énergie",
+      "limit": 1,
+      "settings": [
+        { "type": "text", "id": "durability_score", "label": "Score de durabilité (ex: 9.5)" },
+        {
+          "type": "select",
+          "id": "energy_label",
+          "label": "Étiquette énergie",
+          "options": [
+            { "value": "", "label": "Aucune" },
+            { "value": "A", "label": "A" },
+            { "value": "B", "label": "B" },
+            { "value": "C", "label": "C" },
+            { "value": "D", "label": "D" },
+            { "value": "E", "label": "E" },
+            { "value": "F", "label": "F" },
+            { "value": "G", "label": "G" }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "tab",
+      "name": "Onglet description",
+      "settings": [
+        { "type": "text", "id": "tab_label", "label": "Nom de l'onglet", "default": "Caractéristiques" },
+        { "type": "richtext", "id": "tab_content", "label": "Contenu" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Custom Product Page",
+      "blocks": [
+        { "type": "badge", "settings": { "label": "Soldes d'été" } },
+        { "type": "badge", "settings": { "label": "Choix de l'équipe", "bg_color": "#111111" } },
+        { "type": "rating" },
+        { "type": "discount_code" },
+        { "type": "secondary_action", "settings": { "label": "Demander un devis" } },
+        { "type": "secondary_action", "settings": { "label": "Contacter un conseiller" } },
+        { "type": "callout_box" },
+        { "type": "info_row", "settings": { "text": "Garantie 2 ans incluse" } },
+        { "type": "info_row", "settings": { "text": "Garantie 5 ans disponible à 149€" } },
+        { "type": "info_row", "settings": { "text": "Livraison offerte soit 5,90€ d'économies" } },
+        { "type": "feature_point", "settings": { "text": "Technologie OLED avancée" } },
+        { "type": "feature_point", "settings": { "text": "Fire TV intégré" } },
+        { "type": "feature_point", "settings": { "text": "Prise en charge Dolby Vision et HDR10+" } },
+        { "type": "durability", "settings": { "durability_score": "9.5", "energy_label": "G" } }
+      ]
+    }
+  ]
+}
+{% endschema %}
